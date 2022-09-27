@@ -13,9 +13,11 @@ GameObject:
   - component: {fileID: 8086205344918607104}
   - component: {fileID: 7491295199035885958}
   - component: {fileID: 7491295199035885959}
+  - component: {fileID: 493002270}
+  - component: {fileID: 493002276}
   m_Layer: 0
   m_Name: PlayerShip
-  m_TagString: Untagged
+  m_TagString: Player Ship
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -27,9 +29,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7725648749981250773}
-  m_LocalRotation: {x: 0.000000021855694, y: 0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.27, z: -10}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalScale: {x: 1.8, y: 1.8, z: 1.8}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 8603047077240115983}
@@ -118,7 +120,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed7078af2b66f8b4fabb2e62a94f30ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameManagerIns: {fileID: 0}
+  bulletPrefab: {fileID: 8288116513157973071, guid: b85361d95e29fd148a3df7045ff5810b, type: 3}
+  AudioSourceIns: {fileID: 0}
+  SecondaryAudioSource: {fileID: 0}
+  noAmmoSound: {fileID: 8300000, guid: 7b69beceabbd8f24e8bc62d77ac7ca1c, type: 3}
+  shootSound: {fileID: 8300000, guid: 75adfe9a619833445a701305b983e548, type: 3}
+  playerBulletPrefab: {fileID: 8288116513157973071, guid: b85361d95e29fd148a3df7045ff5810b, type: 3}
   playerSpeed: 15
+  playerShootCooldown: 1
+--- !u!65 &493002270
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7725648749981250773}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.86484116, y: 0.32853347, z: 1.3358217}
+  m_Center: {x: 0, y: 0.16425985, z: 5.835682e-16}
+--- !u!114 &493002276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7725648749981250773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0762e753247dcff44bea0337747ad5cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canShoot: 0
+  bulletSpeed: 45
 --- !u!1001 &2896399967288312582
 PrefabInstance:
   m_ObjectHideFlags: 0
