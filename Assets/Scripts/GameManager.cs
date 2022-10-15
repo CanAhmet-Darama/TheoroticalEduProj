@@ -15,13 +15,31 @@ public class GameManager : MonoBehaviour
     public GameObject enemyPrefab2;
     public GameObject enemyPrefab3;
 
+    public GameObject healthGiver;
+    public byte healthPerGiver;
+    public float duratForHealth;
+    public bool closeToDeath;
+
     public ParticleSystem exploParticle;
+    public ParticleSystem impactParticle;
+    public ParticleSystem ammoCrashParticle;
+
+    public AudioSource AudioSourceIns;
     public AudioClip exploSound;
+    public AudioClip gameOverSound;
+
     public Slider healthBar;
     public TextMeshProUGUI healthBarText;
 
     public TextMeshProUGUI scoreText;
     public short gameScore;
+
+    public TextMeshProUGUI enHText;
+    public TextMeshProUGUI enDText;
+    public TextMeshProUGUI diffiText;
+    public GameObject gameOverPanel;
+
+    public static GameObject currentEnemy;
 
     public bool existsEnemy = false;
     public float whenToSpawnEnemy;
@@ -33,6 +51,22 @@ public class GameManager : MonoBehaviour
         if (SceneManager.GetActiveScene().name == "Main Game Scene")
         {
             InvokeRepeating("CallEnemy",whenToSpawnEnemy,spawnRateEnemy);
+            diffiText = GameObject.Find("Difficulty Text").GetComponent<TextMeshProUGUI>();
+            string hardnessTyped = "Yarrak";
+            switch (gameDifficulty)
+            {
+                case 1:
+                    hardnessTyped = "Easy";
+                    break;
+                case 2:
+                    hardnessTyped = "Normal";
+                    break;
+                case 3:
+                    hardnessTyped = "Hard";
+                    break;
+            }
+            diffiText.text = "Difficulty : " + hardnessTyped;
+            closeToDeath = false;
         }
     }
 
@@ -45,6 +79,10 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene("Main Game Scene");
         Debug.Log(gameDifficulty);
+    }
+    public void LoadMainMenu()
+    {
+        SceneManager.LoadScene("Menu Scene");
     }
     public void SetGameEasy()
     {
@@ -61,6 +99,21 @@ public class GameManager : MonoBehaviour
         gameDifficulty = 3;
         Debug.Log("Difficulty is set to : " + "Difficult");
     }
+    public void GameOver()
+    {
+        GroundMover.groundSpeed = 0;
+        currentEnemy.GetComponent<EnemyController>().enemySpeed = 0;
+        currentEnemy.GetComponent<Rigidbody>().velocity = new Vector3(0,0,0);
+        gameOverPanel.SetActive(true);
+        StartCoroutine(PlayGOSound(0.5f));
+
+    }
+    IEnumerator PlayGOSound(float howManySec)
+    {
+        yield return new WaitForSeconds(howManySec);
+        AudioSourceIns.clip = gameOverSound;
+        AudioSourceIns.Play();
+    }
     void CallEnemy()
     {
         enemySpawnPos.x = Random.Range(-10, 11);
@@ -69,35 +122,47 @@ public class GameManager : MonoBehaviour
             switch(GetRandomEnemyNum())
             {
                 case 1:
-                    Instantiate(enemyPrefab1, enemySpawnPos, enemyPrefab1.transform.rotation);
+                    currentEnemy = Instantiate(enemyPrefab1, enemySpawnPos, enemyPrefab1.transform.rotation);
                     existsEnemy = true;
                     break;
                 case 2:
-                    Instantiate(enemyPrefab1, enemySpawnPos, enemyPrefab1.transform.rotation);
+                    currentEnemy = Instantiate(enemyPrefab1, enemySpawnPos, enemyPrefab1.transform.rotation);
                     existsEnemy = true;
                     break;
                 case 3:
-                    Instantiate(enemyPrefab1, enemySpawnPos, enemyPrefab1.transform.rotation);
+                    currentEnemy = Instantiate(enemyPrefab1, enemySpawnPos, enemyPrefab1.transform.rotation);
                     existsEnemy = true;
                     break;
                 case 4:
-                    Instantiate(enemyPrefab2, enemySpawnPos, enemyPrefab2.transform.rotation);
+                    currentEnemy = Instantiate(enemyPrefab2, enemySpawnPos, enemyPrefab2.transform.rotation);
                     existsEnemy = true;
                     break;
                 case 5:
-                    Instantiate(enemyPrefab2, enemySpawnPos, enemyPrefab2.transform.rotation);
+                    currentEnemy = Instantiate(enemyPrefab2, enemySpawnPos, enemyPrefab2.transform.rotation);
                     existsEnemy = true;
                     break;
                 case 6:
-                    Instantiate(enemyPrefab3, enemySpawnPos, enemyPrefab3.transform.rotation);
+                    currentEnemy = Instantiate(enemyPrefab3, enemySpawnPos, enemyPrefab3.transform.rotation);
                     existsEnemy = true;
                     break;
             }
+            UpdateEnemyTexts();
         }
     }
     byte GetRandomEnemyNum()
     {
         return (byte)Random.Range(1, 7);
     }
+    public void UpdateEnemyTexts()
+    {
+        enHText.text = "E. Health : " + currentEnemy.GetComponent<GeneralShipScript>().healthOfShip;
+        enDText.text = "E. Damage : " + currentEnemy.GetComponent<GeneralShipScript>().damageOfShip;
+    }
+    public void HealShip(GameObject shipToHeal)
+    {
+        shipToHeal.GetComponent<GeneralShipScript>().healthOfShip += healthPerGiver;
+        healthBar.value = shipToHeal.GetComponent<GeneralShipScript>().healthOfShip;
+        healthBarText.text = "" + shipToHeal.GetComponent<GeneralShipScript>().healthOfShip;
 
+    }
 }

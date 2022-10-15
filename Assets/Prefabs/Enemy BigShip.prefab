@@ -119,7 +119,11 @@ MonoBehaviour:
   enemyBullet: {fileID: 8288116513157973071, guid: 5e44335f46a16394abfc64a21a34d728, type: 3}
   scorePerEnemy: 3
   enemyShootingSound: {fileID: 8300000, guid: 5ff823f546b52574a931e1d9b44290a6, type: 3}
+  enemyAimingSound: {fileID: 8300000, guid: f878a5db7ec1cab4bafa2f66a0acb253, type: 3}
   canShoot: 0
+  enemyHealth: 0
+  damageOfEnemy: 0
+  multiplierEnemyPower: 3
 --- !u!54 &-3838099433021824604
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -149,4 +153,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canShoot: 0
+  isBigEnemy: 1
   bulletSpeed: -35

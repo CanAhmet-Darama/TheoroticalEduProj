@@ -1391,6 +1391,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f265dfc125142f44d8cd0304da1a5677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  emptyForNull: {fileID: 0}
+  enemySpawnPos: {x: 0, y: 0, z: 0}
+  enemyPrefab1: {fileID: 0}
+  enemyPrefab2: {fileID: 0}
+  enemyPrefab3: {fileID: 0}
+  exploParticle: {fileID: 0}
+  exploSound: {fileID: 0}
+  healthBar: {fileID: 0}
+  healthBarText: {fileID: 0}
+  scoreText: {fileID: 0}
+  gameScore: 0
+  enHText: {fileID: 0}
+  enDText: {fileID: 0}
+  diffiText: {fileID: 0}
+  existsEnemy: 0
+  whenToSpawnEnemy: 0
+  spawnRateEnemy: 0
 --- !u!4 &1821831268
 Transform:
   m_ObjectHideFlags: 0

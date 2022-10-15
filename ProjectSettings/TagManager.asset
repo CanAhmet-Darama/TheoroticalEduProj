@@ -8,6 +8,7 @@ TagManager:
   - Player Bullet
   - Enemy Bullet
   - Player Ship
+  - Health Giver
   layers:
   - Default
   - TransparentFX

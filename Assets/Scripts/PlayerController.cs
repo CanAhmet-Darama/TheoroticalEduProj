@@ -15,7 +15,6 @@ public class PlayerController : MonoBehaviour
     public AudioClip noAmmoSound;
     public AudioClip shootSound;
     public GameObject playerBulletPrefab;
-    public static byte healthOfPlayer;
     ParticleSystem exploParticle;
 
     Rigidbody playerRb;
@@ -32,7 +31,8 @@ public class PlayerController : MonoBehaviour
         bulletNum = 1;
         volumeDefault = AudioSourceIns.volume;
         playerRb = GetComponent<Rigidbody>();
-        healthOfPlayer = 100;
+        GetComponent<GeneralShipScript>().healthOfShip = 100;
+        GetComponent<GeneralShipScript>().damageOfShip = 1;
     }
 
     // Update is called once per frame
@@ -45,6 +45,7 @@ public class PlayerController : MonoBehaviour
         ShipControl_Shoot();
         ShipControl_Move();
         CheckPlayerBorders();
+        CheckHealth();
     }
 
     void CheckPlayerBorders()
@@ -100,104 +101,29 @@ public class PlayerController : MonoBehaviour
             ShootABullet(playerBulletPrefab,playerShootCooldown, this.gameObject, shootSound, GetComponent<GeneralShipScript>().bulletSpeed, -0.3f);
         }
     }
-    /*IEnumerator ManageBullet(GameObject bulletToShoot)
-    {
-        bulletToShoot
 
-        GameObject bulletInUse = Instantiate(bulletPrefab, new Vector3(transform.position.x, 0.3f, transform.position.z), transform.rotation);
-        AudioSourceIns.Play();
-        bulletInUse.GetComponent<Rigidbody>().velocity = new Vector3(0,0,bulletSpeed);
-        bulletInUse.transform.Find("Bullet Trail").GetComponent<ParticleSystem>().Play();
-        yield return new WaitForSeconds(1);
-        Destroy(bulletInUse);
-    }*/
 
-    /*public GameObject GetABullet(GameObject[] BulletPrefabs)
-    {
-        byte ammoNum = (byte)BulletPrefabs.Length;
-        for (byte i = 0; i < ammoNum; i++)
-        {
-            if (!BulletPrefabs[i].activeInHierarchy)
-            {
-                Debug.Log("Bullet Chosen");
-                return BulletPrefabs[i];
-            }
-        }
-        return gameManagerIns.emptyForNull;
-    }
-    public void ShootBullet(GameObject[] BulletPrefabs)
-    {
-        GameObject bulletToShoot = GetABullet(BulletPrefabs);
-        if (bulletToShoot != gameManagerIns.emptyForNull)
-        {
-            Debug.Log("Bullet Shot");
-            bulletToShoot.SetActive(true);
-            bulletToShoot.transform.position = transform.position;
-            bulletToShoot.GetComponent<Rigidbody>().velocity = Vector3.forward * bulletSpeed;
-            AudioSourceIns.Play();
-        }
-        else
-        {
-            if(this.gameObject.name == "PlayerShip")
-            {
-                Debug.Log("Player is out of ammo");
-                AudioSourceIns.clip = noAmmoSound;
-                AudioSourceIns.Play();
-                AudioSourceIns.clip = shootSound;
-            }
-        }
-    }*/
-
-   /* public void ShootABullet(GameObject[] bulletsToShoot, float coolDown)
-    {
-        byte ammoAmount = (byte)bulletsToShoot.Length;
-        GameObject bulletToShoot = gameManagerIns.emptyForNull;
-        for (int i = 0; i < ammoAmount; i++)
-        {
-            if (bulletsToShoot[i].activeSelf == true)
-            {
-                Debug.Log("Bullet '" +(i+1)+ "' is not available");
-            }
-            else
-            {
-                bulletToShoot = bulletsToShoot[i];
-                //Debug.Log("Bullet Decided : " + bulletToShoot.name);
-                break;
-            }
-
-        }
-
-        if(bulletToShoot.CompareTag("Bullet") && canShoot)
-        {
-            //Debug.Log("Bullet Shot : " + bulletToShoot.name);
-            bulletToShoot.SetActive(true);
-            bulletToShoot.SetActive(true);
-            Debug.Log(bulletToShoot.active);
-            bulletToShoot.transform.position = transform.position;
-            bulletToShoot.GetComponent<Rigidbody>().velocity = Vector3.forward * bulletSpeed;
-            AudioSourceIns.clip = shootSound;
-            AudioSourceIns.volume = volumeDefault;
-            AudioSourceIns.Play();
-            StartCoroutine(AddCooldown(coolDown));
-        }
-        else
-        {
-            if (this.gameObject.name == "PlayerShip")
-            {
-                AudioSourceIns.volume = volumeDefault;
-                Debug.Log("Player is out of ammo");
-                AudioSourceIns.clip = noAmmoSound;
-                AudioSourceIns.volume /= 3;
-                AudioSourceIns.Play();
-            }
-        }
-    }*/
     public void ShootABullet(GameObject bulletOfShot, float cooldown, GameObject shooter, AudioClip shootSoundX, float bulletSpeedG, float extraZAmount)
     {
         if (shooter.GetComponent<GeneralShipScript>().canShoot)
         {
-            GameObject shotBullet = Instantiate(bulletOfShot, new Vector3(shooter.transform.position.x,0.25f, shooter.transform.position.z + extraZAmount), bulletOfShot.transform.rotation);
-            shotBullet.GetComponent<BulletScript>().shooterOfIt = shooter.gameObject;
+            switch (shooter.GetComponent<GeneralShipScript>().isBigEnemy)
+            {
+                case false:
+                    GameObject shotBullet = Instantiate(bulletOfShot, new Vector3(shooter.transform.position.x,0.25f, shooter.transform.position.z + extraZAmount), bulletOfShot.transform.rotation);
+                    shotBullet.GetComponent<BulletScript>().shooterOfIt = shooter.gameObject;
+                    shotBullet.GetComponent<Rigidbody>().velocity = new Vector3(0,0,bulletSpeedG);
+                    break;
+                case true:
+                    float bigShipXShootExtra = 1.35f;
+                    GameObject shotBullet1 = Instantiate(bulletOfShot, new Vector3(shooter.transform.position.x + bigShipXShootExtra, 0.25f, shooter.transform.position.z + extraZAmount), bulletOfShot.transform.rotation);
+                    shotBullet1.GetComponent<BulletScript>().shooterOfIt = shooter.gameObject;
+                    shotBullet1.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, bulletSpeedG);
+                    GameObject shotBullet2 = Instantiate(bulletOfShot, new Vector3(shooter.transform.position.x - bigShipXShootExtra, 0.25f, shooter.transform.position.z + extraZAmount), bulletOfShot.transform.rotation);
+                    shotBullet2.GetComponent<BulletScript>().shooterOfIt = shooter.gameObject;
+                    shotBullet2.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, bulletSpeedG);
+                    break;
+            }
             switch (shooter.tag)
             {
                 case "Player Ship":
@@ -207,19 +133,14 @@ public class PlayerController : MonoBehaviour
                     break;
                 case "Enemy Ship":
                     SecondaryAudioSource.clip = shootSoundX;
-                    SecondaryAudioSource.volume = volumeDefault;
                     SecondaryAudioSource.Play();
                     break;
             }
-            AudioSourceIns.clip = shootSoundX;
-            AudioSourceIns.volume = volumeDefault;
-            AudioSourceIns.Play();
-            shotBullet.GetComponent<Rigidbody>().velocity = new Vector3(0,0,bulletSpeedG);
             StartCoroutine(AddCooldown(cooldown, shooter));
         }
         else
         {
-            if (this.gameObject.name == "PlayerShip")
+            if (this.gameObject.tag == "Player Ship")
             {
                 AudioSourceIns.volume = volumeDefault;
                 Debug.Log("Player is out of ammo");
@@ -240,11 +161,19 @@ public class PlayerController : MonoBehaviour
     {
         if(collision.gameObject.CompareTag("Enemy Ship"))
         {
+            ExplosionFunc(this.transform.position);
+            HealthReducer(GetComponent<GeneralShipScript>().healthOfShip, this.gameObject);
             Destroy(collision.gameObject);
             Destroy(this.gameObject);
-            ExplosionFunc(this.transform.position);
-            HealthReducer(healthOfPlayer);
         }
+        if(collision.gameObject.CompareTag("Enemy Bullet"))
+        {
+            Instantiate(gameManagerIns.impactParticle, transform.position, gameManagerIns.impactParticle.transform.rotation);
+            HealthReducer(GameManager.currentEnemy.GetComponent<GeneralShipScript>().damageOfShip, this.gameObject);
+            Instantiate(gameManagerIns.impactParticle, transform.position, gameManagerIns.impactParticle.transform.rotation);
+            Destroy(collision.gameObject);
+        }
+
     }
     public void ExplosionFunc(Vector3 posOfExp)
     {
@@ -256,10 +185,28 @@ public class PlayerController : MonoBehaviour
         AudioSourceIns.Play();
 
     }
-    public void HealthReducer(byte reduceAmount)
+    public void HealthReducer(byte reduceAmount, GameObject ownerOfHealth)
     {
-        healthOfPlayer -= reduceAmount;
-        gameManagerIns.healthBar.value = healthOfPlayer;
-        gameManagerIns.healthBarText.text = "" + healthOfPlayer;
+        ownerOfHealth.GetComponent<GeneralShipScript>().healthOfShip -= reduceAmount;
+        if(ownerOfHealth.tag == "Player Ship")
+        {
+            if(GetComponent<GeneralShipScript>().healthOfShip > 100)
+            {
+                GetComponent<GeneralShipScript>().healthOfShip = 0;
+            }
+            gameManagerIns.healthBar.value = ownerOfHealth.GetComponent<GeneralShipScript>().healthOfShip;
+            gameManagerIns.healthBarText.text = "" + ownerOfHealth.GetComponent<GeneralShipScript>().healthOfShip;
+        }
     }
+    void CheckHealth()
+    {
+        if (GetComponent<GeneralShipScript>().healthOfShip == 0 || GetComponent<GeneralShipScript>().healthOfShip > 100)
+        {
+            ExplosionFunc(transform.position);
+            gameObject.SetActive(false);
+            gameManagerIns.GameOver();
+        }
+    }
+
+
 }

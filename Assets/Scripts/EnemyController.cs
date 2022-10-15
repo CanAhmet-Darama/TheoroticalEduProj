@@ -10,20 +10,26 @@ public class EnemyController : MonoBehaviour
     public float enemyZPosLimit;
     public float enemyShootingCooldown;
     GameObject playerShip;
+    PlayerController playerCont;
     public GameObject enemyBullet;
     public byte scorePerEnemy;
     public AudioClip enemyShootingSound;
+    public AudioClip enemyAimingSound;
 
     public bool canShoot;
 
-    void Start()
+    [SerializeField] byte multiplierEnemyPower;
+
+    void Awake()
     {
         enemyRb = GetComponent<Rigidbody>();
         gameManagerIns = GameObject.Find("Game Manager").GetComponent<GameManager>();
-    }
-    void Awake()
-    {
         playerShip = GameObject.Find("PlayerShip");
+        playerCont = playerShip.GetComponent<PlayerController>();
+        GetComponent<GeneralShipScript>().healthOfShip = GameManager.gameDifficulty;
+        GetComponent<GeneralShipScript>().healthOfShip += (byte)(multiplierEnemyPower-1);
+        GetComponent<GeneralShipScript>().damageOfShip = (byte)(5 * GameManager.gameDifficulty);
+        GetComponent<GeneralShipScript>().damageOfShip *= (byte)(2 + multiplierEnemyPower);
     }
 
 
@@ -50,10 +56,14 @@ public class EnemyController : MonoBehaviour
 
             if (Mathf.Abs(playerShip.transform.position.x - transform.position.x) < 1)
             {
-                playerShip.GetComponent<PlayerController>().ShootABullet(enemyBullet, enemyShootingCooldown, this.gameObject, enemyShootingSound, GetComponent<GeneralShipScript>().bulletSpeed, 0.5f);
+                if (GetComponent<GeneralShipScript>().canShoot)
+                {
+                    playerShip.GetComponent<PlayerController>().ShootABullet(enemyBullet, enemyShootingCooldown, this.gameObject, enemyShootingSound, GetComponent<GeneralShipScript>().bulletSpeed, 0.5f);
+                }
             }
         }
         CheckPlayerBorders();
+        CheckHealth();
     }
     void CheckPlayerBorders()
     {
@@ -81,16 +91,25 @@ public class EnemyController : MonoBehaviour
 
 
     }
-    void OnCollisionEnter(Collision collision)
+    void CheckHealth()
     {
-        if (collision.gameObject.CompareTag("Player Bullet"))
+        if(GetComponent<GeneralShipScript>().healthOfShip <= 0 || GetComponent<GeneralShipScript>().healthOfShip == 255)
         {
-            Destroy(gameObject);
-            Destroy(collision.gameObject);
             playerShip.GetComponent<PlayerController>().ExplosionFunc(this.transform.position);
             gameManagerIns.existsEnemy = false;
             gameManagerIns.gameScore += scorePerEnemy;
             gameManagerIns.scoreText.text = "Score : " + gameManagerIns.gameScore / 2;
+            Destroy(gameObject);
+        }
+    }
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player Bullet"))
+        {
+            playerCont.HealthReducer(playerShip.GetComponent<GeneralShipScript>().damageOfShip,this.gameObject);
+            Debug.Log("Remaining Enemy Health : " + GetComponent<GeneralShipScript>().healthOfShip);
+            Instantiate(gameManagerIns.impactParticle, transform.position, gameManagerIns.impactParticle.transform.rotation);
+            Destroy(collision.gameObject);
         }
     }
 }
